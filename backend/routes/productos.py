@@ -1,16 +1,15 @@
-
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from bson import ObjectId
 from database import productos
 from schemas.producto import ProductoCrear
+from seguridad import requerir_admin
 
 router = APIRouter(prefix="/productos", tags=["Productos"])
 
 
-@router.post("/")
-def crear_producto(producto: ProductoCrear):
-    datos = producto.model_dump()
-    resultado = productos.insert_one(datos)
+@router.post("/", status_code=201)
+def crear_producto(producto: ProductoCrear, admin: dict = Depends(requerir_admin)):
+    resultado = productos.insert_one(producto.model_dump())
 
     return {
         "mensaje": "Producto creado correctamente",
@@ -47,7 +46,11 @@ def obtener_producto(producto_id: str):
 
 
 @router.put("/{producto_id}")
-def actualizar_producto(producto_id: str, producto: ProductoCrear):
+def actualizar_producto(
+    producto_id: str,
+    producto: ProductoCrear,
+    admin: dict = Depends(requerir_admin),
+):
     if not ObjectId.is_valid(producto_id):
         raise HTTPException(status_code=400, detail="ID inválido")
 
@@ -63,7 +66,7 @@ def actualizar_producto(producto_id: str, producto: ProductoCrear):
 
 
 @router.delete("/{producto_id}")
-def eliminar_producto(producto_id: str):
+def eliminar_producto(producto_id: str, admin: dict = Depends(requerir_admin)):
     if not ObjectId.is_valid(producto_id):
         raise HTTPException(status_code=400, detail="ID inválido")
 
