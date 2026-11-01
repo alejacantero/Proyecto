@@ -1,0 +1,18 @@
+{% extends "tienda/base.html" %}
+
+{% block contenido %}
+<style>
+    .nav-pills .nav-link { color: #1b1f3b; }
+    .nav-pills .nav-link.active { background: #1b1f3b; color: #fff; }
+</style>
+
+<h1 class="titulo mb-3">Panel de administración</h1>
+
+<ul class="nav nav-pills mb-4">
+    <li class="nav-item"><a class="nav-link {% if seccion == 'productos' %}active{% endif %}" href="{% url 'admin_productos' %}">Productos</a></li>
+    <li class="nav-item"><a class="nav-link {% if seccion == 'pedidos' %}active{% endif %}" href="{% url 'admin_pedidos' %}">Pedidos</a></li>
+    <li class="nav-item"><a class="nav-link {% if seccion == 'usuarios' %}active{% endif %}" href="{% url 'admin_usuarios' %}">Usuarios</a></li>
+</ul>
+
+{% block admin %}{% endblock %}
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "tienda/admin_base.html" %}
+
+{% block titulo %}Admin | Nuevo pedido{% endblock %}
+
+{% block admin %}
+<div class="card border-0 shadow-sm" style="max-width: 520px;">
+    <div class="card-body p-4">
+        <h4 class="titulo mb-4">Nuevo pedido</h4>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Cliente</label>
+                <select name="usuario_id" class="form-select" required>
+                    <option value="">Selecciona un cliente...</option>
+                    {% for u in usuarios %}
+                        <option value="{{ u.id }}">{{ u.nombre }} ({{ u.email }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Producto</label>
+                <select name="producto_id" class="form-select" required>
+                    <option value="">Selecciona un producto...</option>
+                    {% for p in productos %}
+                        <option value="{{ p.id }}">{{ p.nombre }} (stock: {{ p.stock }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Cantidad</label>
+                <input type="number" name="cantidad" class="form-control" min="1" value="1" required>
+            </div>
+            <button type="submit" class="btn btn-naranja">Crear pedido</button>
+            <a href="{% url 'admin_pedidos' %}" class="btn btn-outline-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

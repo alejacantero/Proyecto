@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}TechGear{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #a8c0ff; min-height: 100vh; }
+        .navbar-techgear { background: #1b1f3b; }
+        .navbar-techgear .nav-link { color: #dfe4ff; }
+        .navbar-techgear .nav-link:hover { color: #fff; }
+        .btn-naranja { background: #ffb020; color: #1b1f3b; font-weight: 600; border: 0; }
+        .btn-naranja:hover { background: #ff9f00; color: #1b1f3b; }
+        .titulo { color: #1b1f3b; font-weight: 600; }
+        .tarjeta-producto { transition: transform .15s; }
+        .tarjeta-producto:hover { transform: translateY(-4px); }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-techgear">
+        <div class="container">
+            <a class="navbar-brand fw-semibold" href="{% url 'catalogo' %}">⚡ TechGear - Catálogo</a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="menu">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'catalogo' %}">Catálogo</a></li>
+                    {% if request.session.usuario.rol == 'admin' %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_productos' %}">Panel Admin</a></li>
+                    {% endif %}
+                </ul>
+
+                <div class="d-flex align-items-center gap-2">
+                    {% if request.session.token %}
+                        <span class="text-white me-2">Hola, {{ request.session.usuario.nombre }}</span>
+                        <a class="btn btn-naranja btn-sm" href="{% if request.session.usuario.rol == 'admin' %}{% url 'admin_pedidos' %}{% else %}#{% endif %}">Ver Pedidos</a>
+                        <a class="btn btn-outline-light btn-sm" href="{% url 'logout' %}">Salir</a>
+                    {% else %}
+                        <a class="btn btn-outline-light btn-sm" href="{% url 'login' %}">Iniciar sesión</a>
+                        <a class="btn btn-naranja btn-sm" href="{% url 'registro' %}">Registrarse</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+        {% for mensaje in messages %}
+            <div class="alert alert-{{ mensaje.tags|default:'info' }}">{{ mensaje }}</div>
+        {% endfor %}
+
+        {% block contenido %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

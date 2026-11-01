@@ -1,0 +1,39 @@
+{% extends "tienda/admin_base.html" %}
+
+{% block titulo %}Admin | Producto{% endblock %}
+
+{% block admin %}
+<div class="card border-0 shadow-sm" style="max-width: 640px;">
+    <div class="card-body p-4">
+        <h4 class="titulo mb-4">{% if producto.id %}Editar producto{% else %}Nuevo producto{% endif %}</h4>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Nombre</label>
+                <input type="text" name="nombre" class="form-control" value="{{ producto.nombre }}" minlength="2" maxlength="100" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Descripción</label>
+                <textarea name="descripcion" class="form-control" rows="3" maxlength="500" required>{{ producto.descripcion }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Categoría</label>
+                <input type="text" name="categoria" class="form-control" value="{{ producto.categoria }}" minlength="2" maxlength="50" required>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Precio</label>
+                    <input type="number" name="precio" class="form-control" step="any" min="0.01" value="{{ producto.precio|stringformat:'s' }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Stock</label>
+                    <input type="number" name="stock" class="form-control" min="0" step="1" value="{{ producto.stock|stringformat:'s' }}" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-naranja">Guardar</button>
+            <a href="{% url 'admin_productos' %}" class="btn btn-outline-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

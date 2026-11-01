@@ -1,0 +1,36 @@
+{% extends "tienda/base.html" %}
+
+{% block titulo %}TechGear | Iniciar sesión{% endblock %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow border-0">
+            <div class="card-body p-4">
+                <h2 class="titulo text-center mb-4">Iniciar sesión</h2>
+
+                {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Correo</label>
+                        <input type="email" name="email" class="form-control" value="{{ email }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-naranja w-100">Entrar</button>
+                </form>
+
+                <p class="text-center mt-3 mb-0">
+                    ¿No tienes cuenta? <a href="{% url 'registro' %}">Regístrate</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

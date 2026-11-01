@@ -1,44 +1,31 @@
+{% extends "tienda/base.html" %}
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechGear | Productos</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+{% block titulo %}TechGear | Catálogo{% endblock %}
 
-    <nav class="navbar navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="/">TechGear</a>
-            <span class="text-white">Tienda tecnológica</span>
-        </div>
-    </nav>
+{% block contenido %}
+    <h1 class="titulo mb-4">Catálogo de Productos Tecnológicos</h1>
 
-    <main class="container py-5">
-        <h1 class="mb-4">Nuestros productos</h1>
-
-        {% if error %}
-            <div class="alert alert-danger">{{ error }}</div>
-        {% elif productos %}
-            <div class="row g-4">
-                {% for producto in productos %}
-                    <div class="col-md-6 col-lg-4">
-                        <div class="border rounded bg-white p-4 h-100">
-                            <h5>{{ producto.nombre }}</h5>
+    {% if error %}
+        <div class="alert alert-danger text-center">{{ error }}</div>
+    {% elif productos %}
+        <div class="row g-4">
+            {% for producto in productos %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card tarjeta-producto shadow-sm h-100 border-0">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ producto.nombre }}</h5>
                             <p class="text-secondary">{{ producto.descripcion }}</p>
-                            <p><strong>Categoría:</strong> {{ producto.categoria }}</p>
-                            <p><strong>Precio:</strong> ${{ producto.precio|floatformat:0 }}</p>
-                            <p><strong>Stock:</strong> {{ producto.stock }}</p>
+                            <span class="badge text-bg-dark mb-2">{{ producto.categoria }}</span>
+                            <p class="fs-5 fw-bold mb-1">${{ producto.precio|floatformat:0 }}</p>
+                            <p class="text-muted mb-0">Stock: {{ producto.stock }}</p>
                         </div>
                     </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="alert alert-info">Todavía no hay productos registrados.</div>
-        {% endif %}
-    </main>
-
-</body>
-</html>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-light text-center">
+            No hay productos disponibles o la API de FastAPI se encuentra desconectada.
+        </div>
+    {% endif %}
+{% endblock %}

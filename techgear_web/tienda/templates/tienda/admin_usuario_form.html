@@ -1,0 +1,32 @@
+{% extends "tienda/admin_base.html" %}
+
+{% block titulo %}Admin | Editar usuario{% endblock %}
+
+{% block admin %}
+<div class="card border-0 shadow-sm" style="max-width: 520px;">
+    <div class="card-body p-4">
+        <h4 class="titulo mb-4">Editar usuario</h4>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Nombre</label>
+                <input type="text" name="nombre" class="form-control" value="{{ usuario.nombre }}" minlength="2" maxlength="100" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Correo</label>
+                <input type="email" class="form-control" value="{{ usuario.email }}" disabled>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Rol</label>
+                <select name="rol" class="form-select">
+                    <option value="cliente" {% if usuario.rol == 'cliente' %}selected{% endif %}>Cliente</option>
+                    <option value="admin" {% if usuario.rol == 'admin' %}selected{% endif %}>Admin</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-naranja">Guardar</button>
+            <a href="{% url 'admin_usuarios' %}" class="btn btn-outline-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

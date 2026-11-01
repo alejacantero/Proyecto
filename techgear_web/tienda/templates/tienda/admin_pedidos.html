@@ -1,0 +1,54 @@
+{% extends "tienda/admin_base.html" %}
+
+{% block titulo %}Admin | Pedidos{% endblock %}
+
+{% block admin %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="titulo mb-0">Pedidos ({{ pedidos|length }})</h4>
+    <a href="{% url 'admin_pedido_crear' %}" class="btn btn-naranja">+ Nuevo pedido</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Cant.</th><th>Estado</th><th class="text-end">Acciones</th></tr>
+            </thead>
+            <tbody>
+                {% for p in pedidos %}
+                <tr>
+                    <td>{{ p.fecha|date:"d/m/Y H:i" }}</td>
+                    <td>{{ p.usuario_nombre }}</td>
+                    <td>{{ p.producto_nombre }}</td>
+                    <td>{{ p.cantidad }}</td>
+                    <td>
+                        {% if p.estado == 'cancelado' %}
+                            <span class="badge text-bg-secondary">Cancelado</span>
+                        {% else %}
+                            <form method="post" action="{% url 'admin_pedido_estado' p.id %}" class="d-flex gap-1">
+                                {% csrf_token %}
+                                <select name="estado" class="form-select form-select-sm">
+                                    {% for e in estados %}
+                                        <option value="{{ e }}" {% if e == p.estado %}selected{% endif %}>{{ e|capfirst }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button class="btn btn-sm btn-outline-success">Guardar</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <form method="post" action="{% url 'admin_pedido_eliminar' p.id %}" class="d-inline"
+                              onsubmit="return confirm('¿Eliminar este pedido? Si no estaba cancelado, el stock se devuelve.');">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center text-muted py-4">No hay pedidos todavía.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
