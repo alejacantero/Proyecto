@@ -1,12 +1,20 @@
 from django.urls import path
-from . import views, views_admin as admin
+from . import views, views_admin as admin, views_cliente as cliente
 
 urlpatterns = [
     path("", views.listar_productos, name="catalogo"),
     path("login/", views.iniciar_sesion, name="login"),
     path("registro/", views.registro, name="registro"),
     path("logout/", views.cerrar_sesion, name="logout"),
-   
+
+    # Carrito y pedidos del cliente
+    path("carrito/", cliente.carrito_ver, name="carrito"),
+    path("carrito/agregar/", cliente.carrito_agregar, name="carrito_agregar"),
+    path("carrito/vaciar/", cliente.carrito_vaciar, name="carrito_vaciar"),
+    path("carrito/confirmar/", cliente.carrito_confirmar, name="carrito_confirmar"),
+    path("carrito/<str:producto_id>/actualizar/", cliente.carrito_actualizar, name="carrito_actualizar"),
+    path("carrito/<str:producto_id>/eliminar/", cliente.carrito_eliminar, name="carrito_eliminar"),
+    path("mis-pedidos/", cliente.mis_pedidos, name="mis_pedidos"),
 
     # Panel de administración
     path("panel/", admin.admin_inicio, name="admin_inicio"),

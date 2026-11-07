@@ -6,15 +6,18 @@
     <title>{% block titulo %}TechGear{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background: #a8c0ff; min-height: 100vh; }
+        body { background: linear-gradient(180deg, #a8c0ff 0%, #d9e3ff 100%); background-attachment: fixed; min-height: 100vh; }
         .navbar-techgear { background: #1b1f3b; }
         .navbar-techgear .nav-link { color: #dfe4ff; }
         .navbar-techgear .nav-link:hover { color: #fff; }
         .btn-naranja { background: #ffb020; color: #1b1f3b; font-weight: 600; border: 0; }
         .btn-naranja:hover { background: #ff9f00; color: #1b1f3b; }
         .titulo { color: #1b1f3b; font-weight: 600; }
-        .tarjeta-producto { transition: transform .15s; }
-        .tarjeta-producto:hover { transform: translateY(-4px); }
+        .tarjeta-producto { transition: transform .15s, box-shadow .15s; border-radius: 14px; overflow: hidden; }
+        .tarjeta-producto:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(27, 31, 59, .18) !important; }
+        .producto-icono { background: linear-gradient(135deg, #1b1f3b, #3a4283); font-size: 3.2rem; height: 120px; display: flex; align-items: center; justify-content: center; }
+        .item-icono { background: #eef1ff; width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0; }
+        .precio { color: #1b1f3b; font-weight: 700; font-size: 1.3rem; }
     </style>
 </head>
 <body>
@@ -32,13 +35,18 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'catalogo' %}">Catálogo</a></li>
                     {% if request.session.usuario.rol == 'admin' %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'admin_productos' %}">Panel Admin</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'mis_pedidos' %}">Mis compras</a></li>
                     {% endif %}
                 </ul>
 
-                <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
                     {% if request.session.token %}
                         <span class="text-white me-2">Hola, {{ request.session.usuario.nombre }}</span>
-                        <a class="btn btn-naranja btn-sm" href="{% if request.session.usuario.rol == 'admin' %}{% url 'admin_pedidos' %}{% else %}#{% endif %}">Ver Pedidos</a>
+                        <a class="btn btn-light btn-sm" href="{% url 'carrito' %}">
+                            🛒 Carrito
+                            <span class="badge rounded-pill text-bg-danger">{{ request.session.carrito_n|default:0 }}</span>
+                        </a>
+                        <a class="btn btn-naranja btn-sm" href="{% if request.session.usuario.rol == 'admin' %}{% url 'admin_pedidos' %}{% else %}{% url 'mis_pedidos' %}{% endif %}">Ver Pedidos</a>
                         <a class="btn btn-outline-light btn-sm" href="{% url 'logout' %}">Salir</a>
                     {% else %}
                         <a class="btn btn-outline-light btn-sm" href="{% url 'login' %}">Iniciar sesión</a>

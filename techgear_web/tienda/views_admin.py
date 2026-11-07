@@ -59,13 +59,19 @@ def api(request, metodo, ruta, datos=None):
 def detalle_error(respuesta):
     try:
         detalle = respuesta.json().get("detail")
-    except ValueError:
+    except (ValueError, AttributeError):
         detalle = None
 
     if isinstance(detalle, list):  # errores de validación de Pydantic
         return "; ".join(f"{e['loc'][-1]}: {e['msg']}" for e in detalle)
 
-    return detalle or f"Error {respuesta.status_code} de la API"
+    if detalle:
+        return detalle
+
+    if respuesta.status_code in (502, 503, 504):
+        return "La API no está disponible en este momento (puede estar iniciando). Intenta en unos segundos."
+
+    return f"Error {respuesta.status_code} de la API"
 
 
 def obtener_lista(request, ruta):

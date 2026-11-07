@@ -1,4 +1,3 @@
-
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -25,6 +24,7 @@ db = cliente[DATABASE_NAME]
 productos = db["productos"]
 pedidos = db["pedidos"]
 usuarios = db["usuarios"]
+carritos = db["carritos"]
 
 print("Conexión a MongoDB exitosa")
 print("Base de datos utilizada:", DATABASE_NAME)

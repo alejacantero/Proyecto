@@ -24,6 +24,12 @@ def crear_pedido(
     actual: dict = Depends(obtener_usuario_actual),
 ):
 
+    if actual.get("rol") != "admin" and pedido.usuario_id != str(actual["_id"]):
+        raise HTTPException(
+            status_code=403,
+            detail="No puedes crear pedidos a nombre de otro usuario"
+        )
+
     if not ObjectId.is_valid(pedido.usuario_id):
         raise HTTPException(status_code=400, detail="ID de usuario inválido")
 
@@ -54,6 +60,7 @@ def crear_pedido(
     datos = pedido.model_dump()
     datos["usuario_id"] = ObjectId(pedido.usuario_id)
     datos["producto_id"] = ObjectId(pedido.producto_id)
+    datos["precio_unitario"] = producto["precio"]
     datos["estado"] = "registrado"
     datos["fecha"] = datetime.now(timezone.utc)
 
@@ -68,6 +75,25 @@ def crear_pedido(
 @router.get("/")
 def listar_pedidos(admin: dict = Depends(requerir_admin)):
     return [limpiar_pedido(p) for p in pedidos.find()]
+
+
+@router.get("/mis-pedidos")
+def mis_pedidos(actual: dict = Depends(obtener_usuario_actual)):
+    lista = []
+    nombres = {}
+
+    for p in pedidos.find({"usuario_id": actual["_id"]}).sort("fecha", -1):
+        pid = p["producto_id"]
+
+        if pid not in nombres:
+            producto = productos.find_one({"_id": pid})
+            nombres[pid] = producto["nombre"] if producto else "(producto eliminado)"
+
+        p = limpiar_pedido(p)
+        p["producto_nombre"] = nombres[pid]
+        lista.append(p)
+
+    return lista
 
 
 @router.get("/{pedido_id}")

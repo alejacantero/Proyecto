@@ -1,4 +1,5 @@
 import requests
+from .views_admin import detalle_error
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render, redirect
@@ -12,24 +13,47 @@ def listar_productos(request):
 
     try:
         respuesta = requests.get(f"{API_URL}/productos/", timeout=30)
-        respuesta.raise_for_status()
-        productos = respuesta.json()
+
+        if respuesta.ok:
+            productos = respuesta.json()
+        else:
+            error = detalle_error(respuesta)
+
+    except requests.exceptions.Timeout:
+        error = "La API tardó demasiado en responder. Intenta de nuevo en unos segundos."
 
     except requests.exceptions.ConnectionError:
         error = "No se pudo establecer conexión con FastAPI."
 
-    except requests.exceptions.Timeout:
-        error = "La API tardó demasiado en responder."
+    except requests.exceptions.RequestException:
+        error = "La API devolvió una respuesta inesperada."
 
-    except requests.exceptions.RequestException as e:
-        error = f"Error al consultar la API: {e}"
+    categorias = sorted({p.get("categoria", "") for p in productos if p.get("categoria")})
+    busqueda = request.GET.get("q", "").strip()
+    categoria_sel = request.GET.get("categoria", "")
+
+    if categoria_sel:
+        productos = [p for p in productos if p.get("categoria") == categoria_sel]
+
+    if busqueda:
+        texto = busqueda.lower()
+        productos = [
+            p for p in productos
+            if texto in p.get("nombre", "").lower()
+            or texto in p.get("descripcion", "").lower()
+        ]
 
     return render(
         request,
         "tienda/productos.html",
-        {"productos": productos, "error": error},
+        {
+            "productos": productos,
+            "error": error,
+            "categorias": categorias,
+            "busqueda": busqueda,
+            "categoria_sel": categoria_sel,
+        },
     )
-
 
 def iniciar_sesion(request):
     if request.session.get("token"):
@@ -57,6 +81,20 @@ def iniciar_sesion(request):
                     "email": datos["usuario"]["email"],
                     "rol": datos["usuario"].get("rol", "cliente"),
                 }
+
+                # Cargar cuántos artículos tiene ya en su carrito guardado
+                try:
+                    carrito = requests.get(
+                        f"{API_URL}/carrito/",
+                        headers={"Authorization": f"Bearer {datos['access_token']}"},
+                        timeout=30,
+                    )
+                    request.session["carrito_n"] = (
+                        carrito.json().get("cantidad_total", 0) if carrito.ok else 0
+                    )
+                except (requests.exceptions.RequestException, ValueError):
+                    request.session["carrito_n"] = 0
+
                 messages.success(request, "Sesión iniciada correctamente.")
                 return redirect("catalogo")
 
@@ -115,4 +153,3 @@ def cerrar_sesion(request):
     request.session.flush()
     messages.info(request, "Sesión cerrada.")
     return redirect("catalogo")
-

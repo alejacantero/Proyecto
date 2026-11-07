@@ -1,0 +1,41 @@
+{% extends "tienda/base.html" %}
+{% load tienda_extras %}
+
+{% block titulo %}TechGear | Mis pedidos{% endblock %}
+
+{% block contenido %}
+    <h1 class="titulo mb-4">📦 Mis pedidos</h1>
+
+    {% for compra in compras %}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-dark text-white d-flex justify-content-between">
+                <span>Compra del {{ compra.fecha|date:"d/m/Y H:i" }}</span>
+                <strong>Total: ${{ compra.total|floatformat:"0g" }}</strong>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr><th>Producto</th><th>Cant.</th><th>Subtotal</th><th>Estado</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for p in compra.items %}
+                            <tr>
+                                <td>{{ p.producto_nombre }}</td>
+                                <td>{{ p.cantidad }}</td>
+                                <td>${{ p.subtotal|floatformat:"0g" }}</td>
+                                <td><span class="badge text-bg-{{ p.estado|color_estado }}">{{ p.estado|capfirst }}</span></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% empty %}
+        <div class="card border-0 shadow-sm text-center p-5">
+            <div style="font-size: 4rem;">📦</div>
+            <h4 class="titulo mt-2">Aún no tienes pedidos</h4>
+            <p class="text-muted">Cuando confirmes una compra aparecerá aquí.</p>
+            <div><a href="{% url 'catalogo' %}" class="btn btn-naranja">Ir al catálogo</a></div>
+        </div>
+    {% endfor %}
+{% endblock %}

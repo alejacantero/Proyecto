@@ -1,0 +1,89 @@
+{% extends "tienda/base.html" %}
+{% load tienda_extras %}
+
+{% block titulo %}TechGear | Mi carrito{% endblock %}
+
+{% block contenido %}
+    <h1 class="titulo mb-4">🛒 Mi carrito</h1>
+
+    {% if carrito.items %}
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    {% for item in carrito.items %}
+                        <div class="d-flex align-items-center gap-3 p-3 {% if not forloop.last %}border-bottom{% endif %} flex-wrap">
+                            <div class="item-icono">{{ item.categoria|icono }}</div>
+
+                            <div class="flex-grow-1">
+                                <strong>{{ item.nombre }}</strong>
+                                <div class="text-muted small">${{ item.precio|floatformat:"0g" }} c/u</div>
+                                {% if item.sin_stock %}
+                                    <span class="badge text-bg-danger">Solo quedan {{ item.stock }} en stock, ajusta la cantidad</span>
+                                {% endif %}
+                            </div>
+
+                            <form method="post" action="{% url 'carrito_actualizar' item.producto_id %}">
+                                {% csrf_token %}
+                                <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1" max="{{ item.stock }}"
+                                       class="form-control form-control-sm" style="width: 80px;" onchange="this.form.submit()">
+                            </form>
+
+                            <div class="fw-bold text-end" style="min-width: 110px;">${{ item.subtotal|floatformat:"0g" }}</div>
+
+                            <form method="post" action="{% url 'carrito_eliminar' item.producto_id %}"
+                                  onsubmit="return confirm('¿Quitar {{ item.nombre|escapejs }} del carrito?');">
+                                {% csrf_token %}
+                                <button class="btn btn-sm btn-outline-danger" title="Quitar del carrito">🗑</button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <form method="post" action="{% url 'carrito_vaciar' %}" class="mt-3"
+                      onsubmit="return confirm('¿Vaciar todo el carrito?');">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-outline-dark">Vaciar carrito</button>
+                </form>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="titulo mb-3">Resumen del pedido</h5>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Artículos</span><strong>{{ carrito.cantidad_total }}</strong>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-4">
+                            <span class="fs-5">Total</span>
+                            <span class="precio">${{ carrito.total|floatformat:"0g" }}</span>
+                        </div>
+
+                            <form method="post" action="{% url 'carrito_confirmar' %}"
+      data-total="{{ carrito.total|floatformat:'0g' }}"
+      onsubmit="return confirm('¿Confirmar tu pedido por $' + this.dataset.total + '?');">
+                        
+                            {% csrf_token %}
+                            <button class="btn btn-naranja w-100 py-2" {% if hay_sin_stock %}disabled{% endif %}>
+                                ✅ Confirmar pedido
+                            </button>
+                        </form>
+
+                        {% if hay_sin_stock %}
+                            <p class="text-danger small mt-2 mb-0">Ajusta los productos sin stock suficiente para continuar.</p>
+                        {% endif %}
+
+                        <a href="{% url 'catalogo' %}" class="btn btn-outline-dark w-100 mt-2">Seguir comprando</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm text-center p-5">
+            <div style="font-size: 4rem;">🛒</div>
+            <h4 class="titulo mt-2">Tu carrito está vacío</h4>
+            <p class="text-muted">Agrega productos desde el catálogo.</p>
+            <div><a href="{% url 'catalogo' %}" class="btn btn-naranja">Ver catálogo</a></div>
+        </div>
+    {% endif %}
+{% endblock %}
