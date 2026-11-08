@@ -183,11 +183,11 @@ Cierra sesión y vuelve a entrar para ver el **Panel Admin**.
 
 | Servicio | Plataforma | Enlace |
 |---|---|---|
-| Frontend (Django) | Vercel | https://taller2-pydeploy.vercel.app |
-| API (FastAPI) | Render | [https://TU-API.onrender.com] |
-| Documentación de la API | Render | [https://TU-API.onrender.com/docs] |
+| Frontend (Django) | Vercel | https://proyecto-three-iota.vercel.app/ |
+| API (FastAPI) | Render | https://proyecto-r7k0.onrender.com |
+| 
 
-> La API usa el plan gratuito de Render: si estuvo inactiva, la primera petición puede tardar hasta un minuto.
+
 
 ## Autor
 
